@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Primary */
+  --brand-blue: #003399;
+  --brand-nepal: #8CA3B2;
+  --brand-black: #000000;
+  --brand-white: #FFFFFF;
+
+  /* Brand Secondary */
+  --brand-curious-blue: #0A7CC1;
+  --brand-blumine: #336179;
+  --brand-eastern-blue: #0088A1;
+  --brand-strong-green: #186037;
+  --brand-christi-green: #1D9A19;
+
+  /* Brand Accent */
+  --brand-persimmon: #DE4702;
+
+  /* Semantic tokens */
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 2px rgba(0, 51, 153, 0.03), 0 6px 20px rgba(0, 51, 153, 0.06);
+  --card-shadow-hover: 0 2px 4px rgba(0, 51, 153, 0.05), 0 10px 28px rgba(0, 51, 153, 0.09);
+  --card-radius: 1.25rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-card-bg: var(--card-bg);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-nepal: var(--brand-nepal);
+  --color-brand-curious: var(--brand-curious-blue);
+  --color-brand-blumine: var(--brand-blumine);
+  --color-brand-eastern: var(--brand-eastern-blue);
+  --color-brand-green: var(--brand-strong-green);
+  --color-brand-christi: var(--brand-christi-green);
+  --color-brand-persimmon: var(--brand-persimmon);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: linear-gradient(160deg, #ffffff 0%, #f4f6f9 35%, #e9eef3 70%, #dfe6ec 100%) !important;
+    background-attachment: fixed !important;
+    min-height: 100%;
+  }
+
+  body {
+    background: transparent !important;
+    color: var(--foreground);
+    font-family: "Avenir Next LT Pro", "Avenir Next", "Avenir", "Nunito Sans", system-ui, sans-serif;
+    min-height: 100vh;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--brand-nepal);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-blumine);
+}
+
+/* Smooth transitions */
+button, a {
+  transition: all 0.2s ease;
+}
+
+/* Recharts tooltip override */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 51, 153, 0.1) !important;
+  padding: 10px 14px !important;
+  font-family: "Avenir Next LT Pro", "Avenir Next", "Avenir", "Nunito Sans", system-ui, sans-serif !important;
 }
