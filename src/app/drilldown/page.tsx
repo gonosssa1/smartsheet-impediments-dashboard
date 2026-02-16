@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Impediment } from "@/types/impediment";
 import DrilldownFilters from "@/components/drilldown/DrilldownFilters";
 import DrilldownTable from "@/components/drilldown/DrilldownTable";
+import ImpedimentDetailModal from "@/components/drilldown/ImpedimentDetailModal";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 function DrilldownContent() {
@@ -15,8 +16,10 @@ function DrilldownContent() {
   const status = searchParams.get("status");
 
   const [impediments, setImpediments] = useState<Impediment[]>([]);
+  const [columnIds, setColumnIds] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImpediment, setSelectedImpediment] = useState<Impediment | null>(null);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -31,8 +34,9 @@ function DrilldownContent() {
         const body = await res.json();
         throw new Error(body.error ?? `HTTP ${res.status}`);
       }
-      const data: Impediment[] = await res.json();
-      setImpediments(data);
+      const data = await res.json();
+      setImpediments(data.impediments);
+      setColumnIds(data.columnIds);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
@@ -51,6 +55,8 @@ function DrilldownContent() {
         escalatedTo: "escalatedTo",
         severity: "severity",
         resolutionOwner: "resolutionOwner",
+        escalationStatus: "escalationStatus",
+        impedimentTrackingNumber: "impedimentTrackingNumber",
       };
       const key = fieldMap[field];
       if (key && imp[key] !== value) return false;
@@ -91,9 +97,22 @@ function DrilldownContent() {
         Showing{" "}
         <span className="font-semibold text-brand-blumine">{filtered.length}</span>{" "}
         of {impediments.length} impediments
+        <span className="ml-2 text-brand-nepal/60">— click a row to view details</span>
       </p>
 
-      <DrilldownTable impediments={filtered} />
+      <DrilldownTable
+        impediments={filtered}
+        onRowClick={setSelectedImpediment}
+      />
+
+      {selectedImpediment && (
+        <ImpedimentDetailModal
+          impediment={selectedImpediment}
+          columnIds={columnIds}
+          isOpen={!!selectedImpediment}
+          onClose={() => setSelectedImpediment(null)}
+        />
+      )}
     </>
   );
 }

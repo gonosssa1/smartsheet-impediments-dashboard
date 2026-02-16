@@ -1,3 +1,15 @@
+export interface DeadlineItem {
+  id: number;
+  impedimentTrackingNumber: string | null;
+  impedimentTitle: string | null;
+  resolutionCommittedDate: string;
+  resolutionOwner: string | null;
+  resolutionStatusDescription: string | null;
+  severity: string | null;
+  daysUntilDue: number;
+  isOverdue: boolean;
+}
+
 export interface Impediment {
   id: number;
   impedimentStatus: string | null;

@@ -15,3 +15,10 @@ export interface OwnerDataPoint {
   value: number;
   email: string;
 }
+
+export interface TimeSeriesDataPoint {
+  date: string;      // "Jan 15" display label
+  isoDate: string;   // "2026-01-15" for sorting
+  open: number;      // count of open impediments on this date
+  closed: number;    // count of closed impediments on this date
+}

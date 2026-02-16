@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { fetchSheet } from "@/lib/smartsheet";
-import { transformSheet } from "@/lib/transformers";
+import { transformSheet, buildFieldToColumnIdMap } from "@/lib/transformers";
 
 export async function GET() {
   try {
     const sheet = await fetchSheet();
     const impediments = transformSheet(sheet);
-    return NextResponse.json(impediments);
+    const columnIds = buildFieldToColumnIdMap(sheet.columns);
+    return NextResponse.json({ impediments, columnIds });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unknown error fetching impediments";

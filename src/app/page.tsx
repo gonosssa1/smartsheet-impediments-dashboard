@@ -6,12 +6,16 @@ import {
   aggregateEscalatedByPerson,
   aggregateBySeverityAndStatus,
   aggregateByResolutionOwner,
+  aggregateUpcomingDeadlines,
+  aggregateOpenClosedTimeSeries,
 } from "@/lib/aggregators";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import SummaryCards from "@/components/dashboard/SummaryCards";
+import UpcomingDeadlines from "@/components/dashboard/UpcomingDeadlines";
 import EscalatedByPersonChart from "@/components/dashboard/EscalatedByPersonChart";
 import SeverityByStatusChart from "@/components/dashboard/SeverityByStatusChart";
 import ImpedimentsByOwnerChart from "@/components/dashboard/ImpedimentsByOwnerChart";
+import OpenClosedTrendChart from "@/components/dashboard/OpenClosedTrendChart";
 import EscalationSlaTable from "@/components/dashboard/EscalationSlaTable";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
@@ -34,8 +38,8 @@ export default function DashboardPage() {
         const body = await res.json();
         throw new Error(body.error ?? `HTTP ${res.status}`);
       }
-      const data: Impediment[] = await res.json();
-      setImpediments(data);
+      const data = await res.json();
+      setImpediments(data.impediments);
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -85,9 +89,11 @@ export default function DashboardPage() {
     );
   }
 
+  const deadlineItems = aggregateUpcomingDeadlines(impediments);
   const escalatedData = aggregateEscalatedByPerson(impediments);
   const severityData = aggregateBySeverityAndStatus(impediments);
   const ownerData = aggregateByResolutionOwner(impediments);
+  const trendData = aggregateOpenClosedTimeSeries(impediments);
 
   return (
     <main className="min-h-screen p-8">
@@ -98,7 +104,11 @@ export default function DashboardPage() {
           isLoading={isLoading}
         />
 
+        <UpcomingDeadlines items={deadlineItems} />
+
         <SummaryCards impediments={impediments} />
+
+        <OpenClosedTrendChart data={trendData} />
 
         <div className="grid gap-7 lg:grid-cols-2">
           <EscalatedByPersonChart data={escalatedData} />

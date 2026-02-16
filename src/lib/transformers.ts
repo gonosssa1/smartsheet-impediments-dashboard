@@ -79,3 +79,17 @@ export function transformSheet(sheet: SmartsheetSheet): Impediment[] {
     .map((row) => transformRow(row, columnMap))
     .filter((imp) => imp.impedimentTitle != null || imp.impedimentStatus != null);
 }
+
+/** Returns a map of fieldName -> Smartsheet columnId */
+export function buildFieldToColumnIdMap(
+  columns: SmartsheetColumn[]
+): Record<string, number> {
+  const map: Record<string, number> = {};
+  for (const col of columns) {
+    const field = COLUMN_MAP[col.title];
+    if (field) {
+      map[field] = col.id;
+    }
+  }
+  return map;
+}

@@ -5,9 +5,10 @@ import { emailToDisplayName, formatDate, truncateText } from "@/lib/formatters";
 
 interface DrilldownTableProps {
   impediments: Impediment[];
+  onRowClick?: (impediment: Impediment) => void;
 }
 
-export default function DrilldownTable({ impediments }: DrilldownTableProps) {
+export default function DrilldownTable({ impediments, onRowClick }: DrilldownTableProps) {
   if (impediments.length === 0) {
     return (
       <div
@@ -65,7 +66,8 @@ export default function DrilldownTable({ impediments }: DrilldownTableProps) {
           {impediments.map((imp) => (
             <tr
               key={imp.id}
-              className="border-b border-slate-50 transition-colors last:border-none hover:bg-slate-50/50"
+              className={`border-b border-slate-50 transition-colors last:border-none hover:bg-slate-50/50 ${onRowClick ? "cursor-pointer" : ""}`}
+              onClick={() => onRowClick?.(imp)}
             >
               <td className="whitespace-nowrap px-5 py-3.5 font-mono font-medium text-brand-blue">
                 {imp.impedimentTrackingNumber ?? "-"}

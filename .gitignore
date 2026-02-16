@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local tool caches
+.serena/
+
+# scratch notes
+SCRATCH.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
