@@ -1,5 +1,7 @@
 import { SmartsheetSheet } from "@/types/smartsheet";
 
+require('dotenv').config();
+
 const SMARTSHEET_API_BASE = "https://api.smartsheet.com/2.0";
 
 export async function fetchSheet(): Promise<SmartsheetSheet> {
@@ -23,7 +25,9 @@ export async function fetchSheet(): Promise<SmartsheetSheet> {
   if (!response.ok) {
     const errorBody = await response.text();
     throw new Error(
-      `Smartsheet API error ${response.status}: ${errorBody}`
+      `Smartsheet API error ${response.status}: ${errorBody}
+      token is ${token}
+      sheetId is ${sheetId}`
     );
   }
 
