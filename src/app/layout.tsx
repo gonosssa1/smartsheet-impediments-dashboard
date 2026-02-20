@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito_Sans, JetBrains_Mono } from "next/font/google";
+import { Providers } from "./providers";
 import "./globals.css";
 
 // Nunito Sans as web fallback for Avenir Next LT Pro
@@ -31,7 +32,7 @@ export default function RootLayout({
       <body
         className={`${nunitoSans.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

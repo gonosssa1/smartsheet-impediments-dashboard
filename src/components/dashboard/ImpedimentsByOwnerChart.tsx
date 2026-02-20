@@ -26,7 +26,7 @@ export default function ImpedimentsByOwnerChart({
 
   const handleClick = (entry: OwnerDataPoint) => {
     router.push(
-      `/drilldown?field=resolutionOwner&value=${encodeURIComponent(entry.email)}`
+      `/drilldown?status=Open&field=resolutionOwner&value=${encodeURIComponent(entry.email)}`
     );
   };
 
@@ -34,9 +34,10 @@ export default function ImpedimentsByOwnerChart({
 
   return (
     <Card>
-      <h3 className="mb-6 text-[15px] font-semibold tracking-tight text-brand-blumine">
+      <h3 className="text-[15px] font-semibold tracking-tight text-brand-blumine">
         Impediments by Resolution Owner
       </h3>
+      <p className="mb-6 mt-0.5 text-[12px] font-medium text-brand-nepal">Open impediments only</p>
       <ResponsiveContainer width="100%" height={chartHeight}>
         <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
           <CartesianGrid

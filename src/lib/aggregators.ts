@@ -31,6 +31,7 @@ export function aggregateUpcomingDeadlines(
         resolutionOwner: imp.resolutionOwner,
         resolutionStatusDescription: imp.resolutionStatusDescription,
         severity: imp.severity,
+        escalationStatus: imp.escalationStatus,
         daysUntilDue,
         isOverdue: daysUntilDue < 0,
       };
@@ -44,6 +45,7 @@ export function aggregateEscalatedByPerson(
 ): DonutDataPoint[] {
   const escalated = impediments.filter(
     (imp) =>
+      imp.impedimentStatus === "Open" &&
       imp.escalationStatus === "Escalated" &&
       imp.escalatedTo != null &&
       imp.escalatedTo.trim() !== ""
@@ -100,6 +102,7 @@ export function aggregateByResolutionOwner(
   const counts = new Map<string, number>();
 
   for (const imp of impediments) {
+    if (imp.impedimentStatus !== "Open") continue;
     const owner = imp.resolutionOwner;
     if (!owner || owner.trim() === "") continue;
     counts.set(owner, (counts.get(owner) ?? 0) + 1);
@@ -138,6 +141,7 @@ export function aggregateOpenClosedTimeSeries(
 
     let open = 0;
     let closed = 0;
+    let escalated = 0;
 
     for (const imp of impediments) {
       if (!imp.reportedDate) continue;
@@ -147,11 +151,15 @@ export function aggregateOpenClosedTimeSeries(
 
       if (reported.getTime() > dateEnd) continue;
 
-      if (
+      const isOpen =
         imp.resolutionActualDate == null ||
-        new Date(imp.resolutionActualDate).setHours(0, 0, 0, 0) > dateEnd
-      ) {
+        new Date(imp.resolutionActualDate).setHours(0, 0, 0, 0) > dateEnd;
+
+      if (isOpen) {
         open++;
+        if (imp.escalationStatus === "Escalated") {
+          escalated++;
+        }
       } else {
         closed++;
       }
@@ -160,6 +168,6 @@ export function aggregateOpenClosedTimeSeries(
     const iso = date.toISOString().slice(0, 10);
     const label = `${monthNames[date.getMonth()]} ${date.getDate()}`;
 
-    return { date: label, isoDate: iso, open, closed };
+    return { date: label, isoDate: iso, open, closed, escalated };
   });
 }

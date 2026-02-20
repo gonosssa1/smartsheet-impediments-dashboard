@@ -24,7 +24,7 @@ export default function EscalatedByPersonChart({
 
   const handleClick = (entry: DonutDataPoint) => {
     router.push(
-      `/drilldown?field=escalatedTo&value=${encodeURIComponent(entry.email)}`
+      `/drilldown?status=Open&field=escalatedTo&value=${encodeURIComponent(entry.email)}`
     );
   };
 
@@ -34,6 +34,7 @@ export default function EscalatedByPersonChart({
         <h3 className="text-[15px] font-semibold tracking-tight text-brand-blumine">
           Escalated by Person
         </h3>
+        <p className="mt-0.5 text-[12px] font-medium text-brand-nepal">Open impediments only</p>
         <div className="flex h-72 items-center justify-center text-sm text-brand-nepal">
           No escalated impediments
         </div>
@@ -43,9 +44,10 @@ export default function EscalatedByPersonChart({
 
   return (
     <Card>
-      <h3 className="mb-2 text-[15px] font-semibold tracking-tight text-brand-blumine">
+      <h3 className="text-[15px] font-semibold tracking-tight text-brand-blumine">
         Escalated by Person
       </h3>
+      <p className="mb-2 mt-0.5 text-[12px] font-medium text-brand-nepal">Open impediments only</p>
       <div className="flex items-center gap-6">
         <div className="relative flex-shrink-0">
           <ResponsiveContainer width={220} height={220}>
@@ -87,7 +89,7 @@ export default function EscalatedByPersonChart({
               {totalEscalated}
             </span>
             <span className="text-[11px] font-medium text-brand-nepal">
-              Escalated
+              Escalated (Open)
             </span>
           </div>
         </div>

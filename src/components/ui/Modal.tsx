@@ -3,14 +3,23 @@
 import { useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 
+type ModalSize = "default" | "wide" | "fullscreen";
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  size?: ModalSize;
   children: React.ReactNode;
 }
 
-export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
+const PANEL_SIZE_CLASSES: Record<ModalSize, string> = {
+  default: "max-w-2xl max-h-[85vh]",
+  wide: "max-w-5xl max-h-[85vh]",
+  fullscreen: "max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)]",
+};
+
+export default function Modal({ isOpen, onClose, title, size = "default", children }: ModalProps) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -41,7 +50,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
 
       {/* Panel */}
       <div
-        className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[var(--card-radius)] bg-white p-8"
+        className={`relative w-full overflow-y-auto rounded-[var(--card-radius)] bg-white p-8 ${PANEL_SIZE_CLASSES[size]}`}
         style={{ boxShadow: "0 8px 40px rgba(0, 51, 153, 0.15)" }}
         onClick={(e) => e.stopPropagation()}
       >

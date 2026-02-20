@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 
 interface DashboardHeaderProps {
   lastUpdated: Date | null;
@@ -14,19 +13,21 @@ export default function DashboardHeader({
   onRefresh,
   isLoading,
 }: DashboardHeaderProps) {
+  const { data: session } = useSession();
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-5">
         <Image
           src="/protective-logo.png"
           alt="Protective Life"
-          width={56}
+          width={150}
           height={56}
+          quality={90}
           className="h-14 w-auto"
           priority
         />
         <div>
-          <h1 className="text-[1.6rem] tracking-tight text-brand-blue">
+          <h1 className="text-[1.4rem] tracking-tight text-brand-blue">
             <span className="font-bold">Protective Life - AI Acceleration Impediments</span>{" "}
             <span className="font-normal">Dashboard</span>
           </h1>
@@ -87,11 +88,11 @@ export default function DashboardHeader({
           href="https://app.smartsheet.com/sheets/2PRj8fWHQ2W3qvMJ9wVc9wCGmcp8qP3527GPmHh1"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 rounded-xl bg-brand-persimmon px-5 py-2.5 text-[13px] font-semibold text-white transition-all hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-persimmon px-3.5 py-2 text-[12px] font-semibold text-white transition-all hover:opacity-90"
           style={{ boxShadow: "0 2px 8px rgba(222, 71, 2, 0.3)" }}
         >
           <svg
-            className="h-4 w-4"
+            className="h-3.5 w-3.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -108,11 +109,11 @@ export default function DashboardHeader({
         <button
           onClick={onRefresh}
           disabled={isLoading}
-          className="inline-flex items-center gap-2.5 rounded-xl bg-brand-blue px-5 py-2.5 text-[13px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-3.5 py-2 text-[12px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
           style={{ boxShadow: "0 2px 8px rgba(0, 51, 153, 0.25)" }}
         >
         <svg
-          className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+          className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -126,6 +127,20 @@ export default function DashboardHeader({
         </svg>
         {isLoading ? "Refreshing..." : "Refresh Data"}
       </button>
+        {session?.user && (
+          <>
+            <div className="mx-1 h-6 w-px bg-gray-200" />
+            <span className="text-[13px] font-medium text-brand-blue">
+              {session.user.name ?? session.user.email ?? "User"}
+            </span>
+            <button
+              onClick={() => signOut()}
+              className="rounded-lg border border-gray-200 px-3.5 py-2 text-[12px] font-semibold text-gray-600 transition-all hover:bg-gray-50"
+            >
+              Sign Out
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

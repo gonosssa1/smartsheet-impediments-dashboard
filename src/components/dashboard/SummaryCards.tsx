@@ -13,14 +13,14 @@ export default function SummaryCards({ impediments }: SummaryCardsProps) {
   const open = impediments.filter((i) => i.impedimentStatus === "Open").length;
   const closed = impediments.filter((i) => i.impedimentStatus === "Closed").length;
   const escalated = impediments.filter(
-    (i) => i.escalationStatus === "Escalated"
+    (i) => i.escalationStatus === "Escalated" && i.impedimentStatus === "Open"
   ).length;
 
   const cards = [
     { label: "Total Impediments", value: total, accent: "#003399", href: "/drilldown" },
     { label: "Open", value: open, accent: "#0A7CC1", href: "/drilldown?status=Open" },
     { label: "Closed", value: closed, accent: "#186037", href: "/drilldown?status=Closed" },
-    { label: "Escalated", value: escalated, accent: "#DE4702", href: "/drilldown?field=escalationStatus&value=Escalated" },
+    { label: "Escalated (Open)", value: escalated, accent: "#DE4702", href: "/drilldown?status=Open&field=escalationStatus&value=Escalated" },
   ];
 
   return (

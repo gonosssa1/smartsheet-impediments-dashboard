@@ -6,6 +6,7 @@ export interface DeadlineItem {
   resolutionOwner: string | null;
   resolutionStatusDescription: string | null;
   severity: string | null;
+  escalationStatus: string | null;
   daysUntilDue: number;
   isOverdue: boolean;
 }

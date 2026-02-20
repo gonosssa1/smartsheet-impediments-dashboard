@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { DeadlineItem } from "@/types/impediment";
+import { DeadlineItem, Impediment } from "@/types/impediment";
 import { emailToDisplayName, formatDate, truncateText } from "@/lib/formatters";
+import { DUE_SOON_THRESHOLD_DAYS } from "@/lib/constants";
 import Card from "@/components/ui/Card";
 import Modal from "@/components/ui/Modal";
+import ImpedimentDetailModal from "@/components/drilldown/ImpedimentDetailModal";
+
+type EscalationFilter = "all" | "escalated" | "non-escalated";
 
 interface UpcomingDeadlinesProps {
   items: DeadlineItem[];
+  impediments: Impediment[];
+  columnIds: Record<string, number>;
 }
 
 function StatusBadge({ item }: { item: DeadlineItem }) {
@@ -26,11 +32,14 @@ function StatusBadge({ item }: { item: DeadlineItem }) {
       </span>
     );
   }
-  return (
-    <span className="inline-flex items-center rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-brand-blue">
-      DUE SOON
-    </span>
-  );
+  if (item.daysUntilDue <= DUE_SOON_THRESHOLD_DAYS) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-brand-blue">
+        DUE SOON
+      </span>
+    );
+  }
+  return null;
 }
 
 function DaysLabel({ days }: { days: number }) {
@@ -49,13 +58,33 @@ function DaysLabel({ days }: { days: number }) {
   );
 }
 
-export default function UpcomingDeadlines({ items }: UpcomingDeadlinesProps) {
+export default function UpcomingDeadlines({ items, impediments, columnIds }: UpcomingDeadlinesProps) {
   const [selectedItem, setSelectedItem] = useState<DeadlineItem | null>(null);
+  const [detailImpediment, setDetailImpediment] = useState<Impediment | null>(null);
+  const [escalationFilter, setEscalationFilter] = useState<EscalationFilter>("all");
 
   if (items.length === 0) return null;
 
-  const overdueCount = items.filter((i) => i.daysUntilDue < 0).length;
-  const dueSoonCount = items.length - overdueCount;
+  const filteredItems = items.filter((item) => {
+    if (escalationFilter === "escalated") return item.escalationStatus === "Escalated";
+    if (escalationFilter === "non-escalated") return item.escalationStatus !== "Escalated";
+    return true;
+  });
+
+  const overdueCount = filteredItems.filter((i) => i.daysUntilDue < 0).length;
+  const todayCount = filteredItems.filter((i) => i.daysUntilDue === 0).length;
+  const dueSoonCount = filteredItems.filter((i) => i.daysUntilDue > 0 && i.daysUntilDue <= DUE_SOON_THRESHOLD_DAYS).length;
+
+  const handleTitleClick = (item: DeadlineItem) => {
+    const imp = impediments.find((i) => i.id === item.id);
+    if (imp) setDetailImpediment(imp);
+  };
+
+  const filterButtons: { key: EscalationFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "escalated", label: "Escalated" },
+    { key: "non-escalated", label: "Non-Escalated" },
+  ];
 
   return (
     <Card className="overflow-hidden p-0">
@@ -77,6 +106,7 @@ export default function UpcomingDeadlines({ items }: UpcomingDeadlinesProps) {
           <h3 className="text-[15px] font-bold tracking-tight text-brand-blue">
             Upcoming Deadlines
           </h3>
+          <span className="text-[12px] font-medium text-brand-nepal">(Open only)</span>
         </div>
         <div className="flex items-center gap-2">
           {overdueCount > 0 && (
@@ -84,11 +114,32 @@ export default function UpcomingDeadlines({ items }: UpcomingDeadlinesProps) {
               {overdueCount} Overdue
             </span>
           )}
+          {todayCount > 0 && (
+            <span className="rounded-full bg-brand-persimmon/10 px-2.5 py-0.5 text-[12px] font-bold text-brand-persimmon">
+              {todayCount} Today
+            </span>
+          )}
           {dueSoonCount > 0 && (
             <span className="rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[12px] font-bold text-brand-blue">
               {dueSoonCount} Due Soon
             </span>
           )}
+        </div>
+        <div role="group" aria-label="Escalation filter" className="ml-auto flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
+          {filterButtons.map((btn) => (
+            <button
+              key={btn.key}
+              onClick={() => setEscalationFilter(btn.key)}
+              aria-pressed={escalationFilter === btn.key}
+              className={`rounded-md px-3 py-1 text-[12px] font-semibold transition-all ${
+                escalationFilter === btn.key
+                  ? "bg-white text-brand-blue shadow-sm"
+                  : "text-brand-nepal hover:text-brand-blumine"
+              }`}
+            >
+              {btn.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -120,7 +171,7 @@ export default function UpcomingDeadlines({ items }: UpcomingDeadlinesProps) {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
+            {filteredItems.map((item) => (
               <tr
                 key={item.id}
                 className={`border-b border-slate-50 last:border-none ${
@@ -142,8 +193,14 @@ export default function UpcomingDeadlines({ items }: UpcomingDeadlinesProps) {
                     <span className="text-brand-nepal">-</span>
                   )}
                 </td>
-                <td className="max-w-[260px] truncate px-4 py-3 text-brand-blumine">
-                  {truncateText(item.impedimentTitle, 60)}
+                <td className="max-w-[260px] truncate px-4 py-3">
+                  <button
+                    onClick={() => handleTitleClick(item)}
+                    aria-label={`View details for ${item.impedimentTitle}`}
+                    className="max-w-full truncate text-left text-brand-blue hover:underline"
+                  >
+                    {truncateText(item.impedimentTitle, 60)}
+                  </button>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-brand-blumine">
                   {formatDate(item.resolutionCommittedDate)}
@@ -212,6 +269,15 @@ export default function UpcomingDeadlines({ items }: UpcomingDeadlinesProps) {
             </div>
           </div>
         </Modal>
+      )}
+
+      {detailImpediment && (
+        <ImpedimentDetailModal
+          impediment={detailImpediment}
+          columnIds={columnIds}
+          isOpen={true}
+          onClose={() => setDetailImpediment(null)}
+        />
       )}
     </Card>
   );

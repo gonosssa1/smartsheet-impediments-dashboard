@@ -21,4 +21,5 @@ export interface TimeSeriesDataPoint {
   isoDate: string;   // "2026-01-15" for sorting
   open: number;      // count of open impediments on this date
   closed: number;    // count of closed impediments on this date
+  escalated: number; // count of escalated open impediments on this date
 }

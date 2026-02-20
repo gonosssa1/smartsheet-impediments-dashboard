@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Impediment } from "@/types/impediment";
 import {
   aggregateEscalatedByPerson,
@@ -21,6 +21,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function DashboardPage() {
   const [impediments, setImpediments] = useState<Impediment[]>([]);
+  const [columnIds, setColumnIds] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -40,6 +41,7 @@ export default function DashboardPage() {
       }
       const data = await res.json();
       setImpediments(data.impediments);
+      setColumnIds(data.columnIds ?? {});
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -51,6 +53,12 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const deadlineItems = useMemo(() => aggregateUpcomingDeadlines(impediments), [impediments]);
+  const escalatedData = useMemo(() => aggregateEscalatedByPerson(impediments), [impediments]);
+  const severityData = useMemo(() => aggregateBySeverityAndStatus(impediments), [impediments]);
+  const ownerData = useMemo(() => aggregateByResolutionOwner(impediments), [impediments]);
+  const trendData = useMemo(() => aggregateOpenClosedTimeSeries(impediments), [impediments]);
 
   if (isLoading && impediments.length === 0) {
     return (
@@ -89,12 +97,6 @@ export default function DashboardPage() {
     );
   }
 
-  const deadlineItems = aggregateUpcomingDeadlines(impediments);
-  const escalatedData = aggregateEscalatedByPerson(impediments);
-  const severityData = aggregateBySeverityAndStatus(impediments);
-  const ownerData = aggregateByResolutionOwner(impediments);
-  const trendData = aggregateOpenClosedTimeSeries(impediments);
-
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-7xl space-y-7">
@@ -104,7 +106,7 @@ export default function DashboardPage() {
           isLoading={isLoading}
         />
 
-        <UpcomingDeadlines items={deadlineItems} />
+        <UpcomingDeadlines items={deadlineItems} impediments={impediments} columnIds={columnIds} />
 
         <SummaryCards impediments={impediments} />
 

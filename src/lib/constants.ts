@@ -18,11 +18,14 @@ export const SEVERITY_COLORS: Record<string, string> = {
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  Open: "#0A7CC1",   // Curious Blue
-  Closed: "#186037",  // Strong Green
+  Open: "#0A7CC1",      // Curious Blue
+  Closed: "#186037",    // Strong Green
+  Escalated: "#DE4702", // Persimmon
 };
 
 export const SEVERITY_ORDER = ["Critical", "High", "Medium"] as const;
+
+export const DUE_SOON_THRESHOLD_DAYS = 2;
 
 export const COLUMN_TITLES = {
   impedimentStatus: "Impediment Status",
